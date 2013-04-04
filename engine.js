@@ -10,11 +10,15 @@ var Engine = function(canvas) {
 };
 
 Engine.prototype._animLoop = function(render, element) {
-  var lastFrame = +new Date,
-    requestAnimationFrame = requestAnimationFrame || webkitRequestAnimationFrame || mozRequestAnimationFrame;
+  var lastFrame = +new Date;
+  window.requestAnimFrame = (function() {
+    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(callback) {
+      window.setTimeout(callback, 1000 / 60);
+    };
+  })();
 
   function loop(now) {
-    requestAnimationFrame(loop, element);
+    requestAnimFrame(loop, element);
     render(now - lastFrame);
     lastFrame = now;
   }
@@ -31,7 +35,7 @@ Engine.prototype.pause = function() {
 };
 
 Engine.prototype.toggle = function() {
-  if(this._playing) {
+  if (this._playing) {
     this.pause();
   } else {
     this.play();
